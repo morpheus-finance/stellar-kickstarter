@@ -1,4 +1,5 @@
 @startuml
+title Simple issuance without Smart Contract (Example)
 !theme sketchy-outline
 skinparam DefaultFontName monospaced
 autonumber 1 1 "<b>[00]"

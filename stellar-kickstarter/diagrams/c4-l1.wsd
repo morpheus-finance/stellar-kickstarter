@@ -1,0 +1,27 @@
+@startuml c4-l1
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+
+!theme sketchy-outline
+skinparam DefaultFontName monospaced
+
+
+Person(Company, "Company", "Issues and manages digital assets (asset reference tokens and digital securities)")
+Person(Investor, "Investor", "Invests in digital assets (asset reference tokens and digital securities)")
+Person(Admin, "Admin", "Oversees platform operations and monitors transactions")
+
+System(Morfeo, "Morfeo", "A platform for tokenizing and managing digital financial assets (asset reference tokens and digital securities)")
+
+System_Ext(Extension, "Simple Signer", "Wallet Manager.\nConnects to digital wallets to sign transactions")
+System_Ext(Stellar, "Stellar", "Stellar Smart Contracts.\nProcesses on-chain transactions for digital securities")
+System_Ext(Anchor, "Anchor", "Anchor Service USDC/EURC to FIAT USD/EUR/\nFacilitates fiat on/off-ramps for stablecoins")
+
+Rel(Company, Morfeo, "Interacts with")
+Rel(Investor, Morfeo, "Interacts with")
+Rel(Admin, Morfeo, "Administers and monitors")
+
+Rel(Morfeo, Extension, "Uses for signs transactions")
+Rel(Morfeo, Stellar, "Uses for on-chain transactions")
+Rel(Morfeo, Anchor, "Uses for fiat on/off ramps")
+
+@enduml

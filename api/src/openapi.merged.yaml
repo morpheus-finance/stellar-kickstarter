@@ -1,0 +1,320 @@
+openapi: 3.1.0
+info:
+  title: Morpheus Server API
+  description: The API specifications for the Morpheus Finance server.
+  version: 1.0.0-dev.1
+servers:
+  - url: https://api.morpheus.finance/v1
+  - url: https://api.dev.morpheus.finance/v1
+tags:
+  - name: Issuances
+    description: Operations related to issuances.
+paths:
+  /issuances/{issuance_id}:
+    parameters:
+      - $ref: '#/components/parameters/issuance_id'
+    get:
+      operationId: getIssuance
+      summary: Get issuance
+      tags:
+        - Issuances
+      description: Get an issuance by id.
+      security: []
+      responses:
+        '200':
+          description: The retrieved issuance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetIssuanceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  parameters:
+    issuance_id:
+      in: path
+      name: issuance_id
+      description: The id of the issuance.
+      schema:
+        type: string
+        format: uuid
+      required: true
+  schemas:
+    IssuanceType:
+      type: string
+      enum:
+        - ASSET
+        - FINANCIAL_INSTRUMENT
+    Issuance:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the issuance.
+        issuance_type:
+          $ref: '#/components/schemas/IssuanceType'
+        company_id:
+          type: string
+          description: The id of the company that issued the issuance.
+        token_amount:
+          type: integer
+          format: int32
+          description: The amount of token issued within the issuance.
+        created_at:
+          type: string
+          format: date-time
+          description: When the issuance has been created.
+        name:
+          type: string
+          description: The name shown of the issuance.
+        external_reference:
+          type: string
+          description: The external reference via which the issuance was created.
+        terms_of_contract_url:
+          type: string
+          format: uri
+          description: The URL where to find the terms of the contract.
+        frozen_token_amount:
+          type: integer
+          format: int32
+          description: |-
+            The amount of tokens that has been frozen. A token is frozen when it
+            is sold to an investor but the investor decides to let the company
+            have the custody of the token. The company cannot sell the token to
+            another investor.
+      required:
+        - id
+        - issuance_type
+        - company_id
+        - token_amount
+        - created_at
+        - name
+        - external_reference
+        - terms_of_contract_url
+        - frozen_token_amount
+    AssetType:
+      type: string
+      enum:
+        - GOLD
+        - PALLADIUM
+        - SILVER
+    AssetIssuance:
+      type: object
+      description: |-
+        An entity that represents an issuance of an asset. An asset is a
+        fungible resource tokenized on the blockchain.
+      allOf:
+        - $ref: '#/components/schemas/Issuance'
+        - type: object
+          title: AssetIssuanceExt
+          properties:
+            asset_type:
+              description: The type of asset tokenized by the issuance.
+              $ref: '#/components/schemas/AssetType'
+            circulating_token_amount:
+              type: integer
+              format: int32
+              description: The total amount of tokens that are circulating among the investors.
+            burnt_token_amount:
+              type: integer
+              format: int32
+              description: |-
+                The total amount of tokens that have been burnt. Tokens are usually
+                burnt when the investors decide to redeem them for the underlying
+                asset. The redemption process includes the burning of the tokens
+                indeed.
+          required:
+            - asset_type
+            - circulating_token_amount
+            - burnt_token_amount
+    FinancialInstrumentIssuance:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Issuance'
+        - type: object
+          title: FinancialInstrumentIssuanceExt
+          properties:
+            nominal_value:
+              type: number
+              format: double
+              description: The nominal value of the issuance.
+            currency:
+              type: string
+              description: The currency of the issuance.
+            yearly_interest_rate:
+              type: number
+              format: double
+              description: The yearly interest rate of the issuance expressed as a rate from 0 to 1.
+            type:
+              type: string
+              description: The type of the issuance.
+            total_nominal_value:
+              type: number
+              format: double
+              description: The total value of the issuance.
+            returned_nominal_value:
+              type: number
+              format: double
+              description: The returned face value of the issuance.
+            paid_interest:
+              type: number
+              format: double
+              description: The total interest paid.
+            interest_to_be_paid:
+              type: number
+              format: double
+              description: The total interest to be paid.
+            paid_interest_percentage:
+              type: number
+              format: double
+              description: The percentage of the paid interest.
+            maturity_date:
+              type: string
+              format: date-time
+              description: The maturity date of the issuance.
+            elapsed_months:
+              type: integer
+              format: int32
+              description: The elapsed months from the creation date until the current date.
+            maturity_in_months:
+              type: integer
+              format: int32
+              description: The number of months from the starting date [createdAt] until the maturity date [maturityDate].
+            months_until_maturity:
+              type: integer
+              format: int32
+              description: The number of months from the current date until the maturity date.
+            is_matured:
+              type: boolean
+              description: Whether the issuance has matured, i.e., the current date is after the maturity date.
+          required:
+            - nominal_value
+            - currency
+            - yearly_interest_rate
+            - type
+            - total_nominal_value
+            - returned_nominal_value
+            - paid_interest
+            - interest_to_be_paid
+            - paid_interest_percentage
+            - maturity_date
+            - elapsed_months
+            - maturity_in_months
+            - months_until_maturity
+            - is_matured
+    GetIssuanceResponseIssuance:
+      oneOf:
+        - $ref: '#/components/schemas/AssetIssuance'
+        - $ref: '#/components/schemas/FinancialInstrumentIssuance'
+      discriminator:
+        propertyName: issuance_type
+        mapping:
+          ASSET: '#/components/schemas/AssetIssuance'
+          FINANCIAL_INSTRUMENT: '#/components/schemas/FinancialInstrumentIssuance'
+    CompanyInvestor:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        first_name:
+          type: string
+        last_name:
+          type: string
+      required:
+        - id
+        - first_name
+        - last_name
+    Investment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the investment.
+          readOnly: true
+        issuance_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the issuance.
+        investor_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the investor.
+        initial_quota:
+          type: number
+          format: float
+          description: |-
+            The initial quota of the tokens owned by the investor the issuance
+            was created, that is, when the first issuance transactions were
+            made.
+          readOnly: true
+        current_quota:
+          type: number
+          format: float
+          description: The current quota of the tokens owned by the investor.
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          description: When the investment was created.
+          readOnly: true
+        custodial_token_amount:
+          type: integer
+          format: int32
+          description: The amount of tokens that are in the custody of the investor.
+          readOnly: true
+        noncustodial_token_amount:
+          type: integer
+          format: int32
+          description: |-
+            The amount of tokens that are legally owned by the investor but that
+            are not in the custody of the investor.
+          readOnly: true
+      required:
+        - id
+        - issuance_id
+        - investor_id
+        - initial_quota
+        - current_quota
+        - created_at
+        - custodial_token_amount
+        - noncustodial_token_amount
+    GetIssuanceResponse:
+      type: object
+      properties:
+        issuance:
+          $ref: '#/components/schemas/GetIssuanceResponseIssuance'
+        investors:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/CompanyInvestor'
+        investments:
+          type: array
+          additionalProperties:
+            $ref: '#/components/schemas/Investment'
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+  responses:
+    BadRequest:
+      description: The format of the request is not valid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: 404 Not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

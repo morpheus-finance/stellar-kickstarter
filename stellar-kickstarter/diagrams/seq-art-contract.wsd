@@ -1,0 +1,48 @@
+@startuml art-contract
+!theme sketchy-outline
+skinparam DefaultFontName monospaced
+autonumber 1 1 "<b>[00]"
+
+actor Company as c
+' control "Anchor\nfiat on/off-ramp" as a
+control "Smart Contract" as sc
+' control "Oracle" as o
+actor Investor as i
+
+== Issuance ==
+create sc
+c -> sc: Issue(max_token_supply)
+
+== Mint ==
+c -> sc: Mint(token_amount)
+sc --> c: tokens
+
+' == Investment ==
+' i -> sc: Invest(amount: int, : stablecoin)
+' sc -> o: Get asset price
+' o --> sc: price in stablecoin
+' sc -> sc: Calculate total price
+' alt #LightGreen price <= input stablecoins
+'   i --> sc: total price: stablecoin
+'   note over investor, sc: The investor is debited the total price
+'   sc -> a: Exchange(total price: stablecoin)
+'   a --> c: total price : EUR/USD
+'   sc --> i: amount : tokens
+' else #Pink price is invalid
+'   sc -> i: Error: insufficient funds
+' end 
+
+' sc -> a: Exchange(: stablecoin)
+' a --> c: : EUR/USD
+' sc --> i: : tokens
+
+== Transfer ==
+
+c -> sc: Send(tokens, investor)
+sc --> i: tokens
+
+== Redeem ==
+i -> sc: Redeem(tokens)
+sc -> sc: burn tokens
+
+@enduml

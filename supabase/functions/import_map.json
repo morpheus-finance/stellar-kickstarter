@@ -1,0 +1,8 @@
+{
+  "imports": {
+    "grapheme-splitter": "npm:grapheme-splitter@^1.0.4",
+    "supabase": "https://cdn.skypack.dev/@supabase/supabase-js",
+    "express": "npm:express@4.21.0",
+    "@types/express": "npm:@types/express@^4.17.21"
+  }
+}

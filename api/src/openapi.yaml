@@ -1,0 +1,25 @@
+openapi: 3.1.0
+info:
+  title: Morpheus Server API
+  description: |-
+    The API specifications for the Morpheus Finance server.
+  version: 1.0.0-dev.1
+
+servers:
+  - url: https://api.morpheus.finance/v1
+  - url: https://api.dev.morpheus.finance/v1
+
+tags:
+  - name: Issuances
+    description: Operations related to issuances.
+
+paths:
+  #*==========================*#
+  #*==== PUBLIC ENDPOINTS ====*#
+  #*==========================*#
+
+  #*========================*#
+  #*==== AUTH ENDPOINTS ====*#
+  #*========================*#
+  /issuances/{issuance_id}:
+    $ref: resources/issuances/$issuanceId/_index.yaml

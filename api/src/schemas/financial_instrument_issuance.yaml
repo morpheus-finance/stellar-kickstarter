@@ -1,0 +1,82 @@
+openapi: 3.1.0
+info:
+  title: FinancialInstrumentIssuance
+  version: 1.0.0
+
+components:
+  schemas:
+    FinancialInstrumentIssuance:
+      type: object
+      allOf:
+        - $ref: ../schemas/Issuance.yaml#/components/schemas/Issuance
+        - type: object
+          title: FinancialInstrumentIssuanceExt
+          properties:
+            nominal_value:
+              type: number
+              format: double
+              description: The nominal value of the issuance.
+            currency:
+              type: string
+              description: The currency of the issuance.
+            yearly_interest_rate:
+              type: number
+              format: double
+              description: The yearly interest rate of the issuance expressed as a rate from 0 to 1.
+            type:
+              type: string
+              description: The type of the issuance.
+            total_nominal_value:
+              type: number
+              format: double
+              description: The total value of the issuance.
+            returned_nominal_value:
+              type: number
+              format: double
+              description: The returned face value of the issuance.
+            paid_interest:
+              type: number
+              format: double
+              description: The total interest paid.
+            interest_to_be_paid:
+              type: number
+              format: double
+              description: The total interest to be paid.
+            paid_interest_percentage:
+              type: number
+              format: double
+              description: The percentage of the paid interest.
+            maturity_date:
+              type: string
+              format: date-time
+              description: The maturity date of the issuance.
+            elapsed_months:
+              type: integer
+              format: int32
+              description: The elapsed months from the creation date until the current date.
+            maturity_in_months:
+              type: integer
+              format: int32
+              description: The number of months from the starting date [createdAt] until the maturity date [maturityDate].
+            months_until_maturity:
+              type: integer
+              format: int32
+              description: The number of months from the current date until the maturity date.
+            is_matured:
+              type: boolean
+              description: Whether the issuance has matured, i.e., the current date is after the maturity date.
+          required:
+            - nominal_value
+            - currency
+            - yearly_interest_rate
+            - type
+            - total_nominal_value
+            - returned_nominal_value
+            - paid_interest
+            - interest_to_be_paid
+            - paid_interest_percentage
+            - maturity_date
+            - elapsed_months
+            - maturity_in_months
+            - months_until_maturity
+            - is_matured

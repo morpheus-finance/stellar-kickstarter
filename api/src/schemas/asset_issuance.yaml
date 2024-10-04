@@ -1,0 +1,35 @@
+openapi: 3.1.0
+info:
+  title: AssetIssuance schema
+  version: 1.0.0
+components:
+  schemas:
+    AssetIssuance:
+      type: object
+      description: |-
+        An entity that represents an issuance of an asset. An asset is a
+        fungible resource tokenized on the blockchain.
+      allOf:
+        - $ref: 'issuance.yaml#/components/schemas/Issuance'
+        - type: object
+          title: AssetIssuanceExt
+          properties:
+            asset_type:
+              description: The type of asset tokenized by the issuance.
+              $ref: 'asset_type.yaml#/components/schemas/AssetType'
+            circulating_token_amount:
+              type: integer
+              format: int32
+              description: The total amount of tokens that are circulating among the investors.
+            burnt_token_amount:
+              type: integer
+              format: int32
+              description: |-
+                The total amount of tokens that have been burnt. Tokens are usually
+                burnt when the investors decide to redeem them for the underlying
+                asset. The redemption process includes the burning of the tokens
+                indeed.
+          required:
+            - asset_type
+            - circulating_token_amount
+            - burnt_token_amount

@@ -1,0 +1,7 @@
+in: path
+name: issuance_id
+description: The id of the issuance.
+schema:
+  type: string
+  format: uuid
+required: true

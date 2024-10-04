@@ -1,0 +1,76 @@
+@startuml
+!theme sketchy-outline
+skinparam DefaultFontName monospaced
+autonumber 1 1 "<b>[00]"
+
+actor User as user
+participant WebBrowser as web
+participant SimpleSigner as sign
+participant Wallet as ext
+participant IssuanceService as api
+database PostgresDatabase as db
+database StellarNetwork as net
+
+user -> web: Fill form
+web -> api: HTTP POST /issuances?action=generate
+activate api
+api --> api: generate_transaction(\n  company, amount\n)
+note over api
+// generate_transaction()
+
+keys = Keypair.random()
+
+tx = new Transaction(asset, keys.pub)
+    .addOperation(new ChangeTrust(company)))
+    .addOperation(new Payment(company, amount))
+
+tx.sign(keys.private)
+
+// Keys are not stored.
+// No more tokens can be minted after.
+
+return tx.xdr()
+endnote
+return //transaction XDR//
+
+web -> sign: launch /sign/?xdr={{XDR}}
+sign -> ext: connect
+sign <-- ext: connected
+sign -> ext: sign transaction
+ext -> user: approve
+user --> ext: approved
+sign <-- ext: signed transaction
+web <-- sign: signed transaction
+web -> api: HTTP POST /issuances?action=confirm
+activate api
+  api --> api: validate transaction
+  note over api
+  tx = Transaction.fromXDR(body.xdr)
+  // ...validate payload
+  return isValid
+  endnote
+
+  alt #Pink is not valid
+    api --> web: 400 Bad Request / 403 Forbidden
+  else #LightGreen isValid=TRUE
+      api -> db: create issuance (pending=true)
+      note over db
+      The issuance is stored in
+      the database with a flag
+      indicating it is pending. 
+      endnote
+      api -> net: submit transaction
+      api --> web: 202 Accepted
+      ...
+      ... //**time for the transaction to be confirmed on stellar**// ...
+      ...
+      net --> api: transaction confirmed
+      note over api
+      If somehow the transaction gets
+      rejected, the issuance will be
+      marked as <font color=orange>failed</font> in the database
+      endnote
+      api -> db: update issuance
+      deactivate api
+  end
+@enduml

@@ -1,0 +1,22 @@
+openapi: 3.1.0
+
+info:
+  title: CompanyInvestor
+  version: 1.0.0
+
+components:
+  schemas:
+    CompanyInvestor:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        first_name:
+          type: string
+        last_name:
+          type: string
+      required:
+        - id
+        - first_name
+        - last_name

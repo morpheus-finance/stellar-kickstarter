@@ -1,0 +1,43 @@
+{
+  "folders": [
+    {
+      "name": "/",
+      "path": "."
+    },
+    {
+      "name": ".github",
+      "path": ".github"
+    },
+    {
+      "name": "api",
+      "path": "api"
+    },
+    {
+      "name": "morpheus-remix",
+      "path": "morpheus-remix"
+    },
+    {
+      "name": "supabase",
+      "path": "supabase"
+    },
+    {
+      "name": "supabase/functions",
+      "path": "supabase/functions"
+    },
+    {
+      "name": "docs",
+      "path": "docs"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "supabase/functions/": true
+    },
+    "yaml.schemas": {
+      "openapi:v3": [
+        "file:///Users/gcalbi/workspace/morpheus-app/api/responses/responses.yaml",
+        "file:///Users/gcalbi/workspace/morpheus-app/api/src/openapi.merged.yaml"
+      ]
+    }
+  }
+}

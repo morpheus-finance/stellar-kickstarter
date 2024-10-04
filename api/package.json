@@ -1,0 +1,10 @@
+{
+  "name": "morpheus-api",
+  "version": "1.0.0",
+  "description": "API for Morpheus Finance server",
+  "author": "Gianmarco Calbi",
+  "dependencies": {
+    "@openapitools/openapi-generator-cli": "^2.13.7",
+    "@redocly/cli": "^1.25.3"
+  }
+}

@@ -1,0 +1,13 @@
+openapi: 3.1.0
+info:
+  title: AssetType
+  version: 1.0.0
+
+components:
+  schemas:
+    AssetType:
+      type: string
+      enum:
+        - GOLD
+        - PALLADIUM
+        - SILVER

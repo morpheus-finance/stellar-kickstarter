@@ -1,0 +1,12 @@
+openapi: 3.1.0
+info:
+  title: IssuanceType
+  version: 1.0.0
+
+components:
+  schemas:
+    IssuanceType:
+      type: string
+      enum:
+        - ASSET
+        - FINANCIAL_INSTRUMENT

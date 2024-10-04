@@ -1,0 +1,31 @@
+openapi: 3.1.0
+
+info:
+  title: GetIssuanceResponse
+  version: 1.0.0
+
+components:
+  schemas:
+    GetIssuanceResponseIssuance:
+      oneOf:
+        - $ref: ../schemas/asset_issuance.yaml#/components/schemas/AssetIssuance
+        - $ref: ../schemas/financial_instrument_issuance.yaml#/components/schemas/FinancialInstrumentIssuance
+      discriminator:
+        propertyName: issuance_type
+        mapping:
+          ASSET: ../schemas/asset_issuance.yaml#/components/schemas/AssetIssuance
+          FINANCIAL_INSTRUMENT: ../schemas/financial_instrument_issuance.yaml#/components/schemas/FinancialInstrumentIssuance
+
+    GetIssuanceResponse:
+      type: object
+      properties:
+        issuance:
+          $ref: '#/components/schemas/GetIssuanceResponseIssuance'
+        investors:
+          type: object
+          additionalProperties:
+            $ref: ../schemas/company_investor.yaml#/components/schemas/CompanyInvestor
+        investments:
+          type: array
+          additionalProperties:
+            $ref: ../schemas/investment.yaml#/components/schemas/Investment

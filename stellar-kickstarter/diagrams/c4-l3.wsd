@@ -1,0 +1,48 @@
+@startuml c4-l2-diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+!theme sketchy-outline
+skinparam DefaultFontName monospaced
+Container_Boundary(vercel, "Vercel") {
+    Container(app, "Web App", "Remix, React, Typescript")
+}
+Container_Boundary(supabase, "Supabase") {
+    Container_Boundary(api, "Morfeo API") {
+        Component(issuanceService, "Issuance Service", "Serveless Function", "Creates, signs and submits transactions to deploy smart contracts")
+        Component(blockchainSyncService, "Blockchain Sync Service", "Serveless Function", "Fetches data from blockchain and updates DB accordingly")
+    }
+
+
+    Container_Boundary(db, "Postgres Database") {
+        ContainerDb(tables, "Tables", "DB raw tables")
+        ContainerDb(views, "Views", "DB views with RLS - Row Level Security")
+        Component(postgrest, "Postgrest", "DB Extension", "Exposes API to reads from DB views")
+
+        Rel(views, tables, "Reads from")
+        Rel(postgrest, views, "Reads from")
+    }
+
+    Component(auth, "Auth", "Supabase", "Manages user authentication and authorization")
+    Component(ScDeployer, "ScDeployer", "Rust + Soroban", "Smart contract deployer. Deploys custom smart contracts on Stellar")
+}
+
+
+System_Ext(Stellar, "Stellar", "Stellar Smart Contracts")
+System_Ext(Extension, "Simple Signer", "Wallet Manager")
+
+Rel(issuanceService, ScDeployer, "Uses")
+Rel(ScDeployer, Stellar, "Deploys SC to")
+Rel(app, postgrest, "Reads from views using", "JSON/HTTPS")
+Rel(app, auth, "Uses", "JSON/HTTPS")
+Rel(app, Extension, "Uses")
+Rel(app, issuanceService, "Uses", "JSON/HTTPS")
+Rel(app, blockchainSyncService, "Uses", "JSON/HTTPS")
+Rel(blockchainSyncService, tables, "Reads/writes to")
+Rel(issuanceService, tables, "Reads/writes to")
+Rel(issuanceService, Stellar, "Deploys to")
+Rel(auth, tables, "Reads from / Writes to")
+Rel(blockchainSyncService, Stellar, "Fetches")
+
+' Rel(ma, sign, "Uses", "JSON/HTTPS")
+' Rel(ma, accounts, "Uses", "JSON/HTTPS")
+@enduml

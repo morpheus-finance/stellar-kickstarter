@@ -1,0 +1,35 @@
+@startuml seq-financial-instrument-contract
+!theme sketchy-outline
+skinparam DefaultFontName monospaced
+autonumber 1 1 "<b>[00]"
+
+actor Company as c
+control "Anchor\nfiat on/off-ramp" as a
+control "Smart Contract" as sc
+actor Investor as i
+
+== Issuance ==
+create sc
+c -> sc: Issue(max_token_supply, ...params)
+
+== Mint ==
+c -> sc: Mint(token_amount)
+sc --> c: tokens
+
+
+== Investment ==
+i -> sc: Invest(stablecoins)
+sc -> a: Exchange(stablecoins)
+a --> c: : EUR/USD
+sc --> i: : tokens
+
+== Yield ==
+loop every M months
+  c -> sc: Pay(amount: stablecoin)
+  hnote across: the amount is equally divided among all N investors
+  loop for each of investor N
+    sc --> i: amount / N: stablecoin
+  end
+end
+
+@enduml

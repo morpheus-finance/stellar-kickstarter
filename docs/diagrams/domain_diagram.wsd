@@ -1,0 +1,242 @@
+@startuml Domain Diagram - Company side
+
+!theme reddress-lightorange
+skinparam defaultFontName monospaced
+' skinparam groupInheritance 2
+
+title Domain Diagram
+
+class "Auth.User" as AuthUser {
+  //The signed in User.//
+  //Common to all users//
+  //(CompanyUser, Investor).//
+  //Platoform-specific.//
+  --
+  +id : String
+  +email : String
+  //...auth properties...//
+}
+
+class Company {
+  +id : String
+  +name : String
+  +createdAt : Date
+  ==**Relations**==
+  +companyUsers : CompanyUser[]
+  +issuances : Issuance[]
+}
+
+together {
+  class CompanyUser {
+    //The User that is part of a Company//
+    --
+    +id : String
+    +companyId : String
+    +userId : String
+    +firstName : String
+    +lastName : String
+    +createdAt : Date
+    +role : Role
+    +notificationEnabled : boolean
+    ==**Relations**==
+    +company : Company
+    +user : User
+  }
+
+  enum Role {
+    OWNER
+    ADMIN
+    USER
+  }
+}
+
+together {
+  abstract Issuance {
+    //The Issuance of a Company.//
+    //It's an abstract class.//
+    --
+    +id : String
+    +name : String
+    +companyId : String
+    +tokenAmount : int
+    +createdAt : Date
+    +lastUpdatedAt : Date
+    +externalReference : String
+    +termsOfContractUrl : String
+    +frozenTokenAmount : int
+    ==**Relations**==
+    +company : Company
+    +investments : Investment[]
+    ==**Derived**==
+    //...aggregated data of investments...//
+  }
+
+
+  enum FinancialInstrumentType {
+    CONVERTIBLE
+    SENIOR_NOTE
+  }
+
+  class FinancialInstrumentIssuance {
+    +nominalValue : double
+    +currency: String
+    +yearlyInterestRate : double
+    +financialInstrumentType : FinancialInstrumentType
+    +maturityInMonths : int
+    +returnedNominalValue : int
+    +paidInterest : double
+    +interestToBePaid : double
+    ==**Relations**==
+    +payments : Payment[]
+    ==**Derived**==
+    +totalNominalValue : int
+    +getInterestToBePaid() : double
+    +getPaidInterestPercentage() : double
+  }
+
+  class AssetIssuance {
+    +assetType: AssetType
+    +circulatingTokenAmount: int
+    +burntTokenAmount: int
+  }
+
+  enum AssetType {
+    GOLD
+    SILVER
+    PALLADIUM
+  }
+}
+
+class Investor {
+  +id : String
+  +createdAt : Date
+  +firstName : String
+  +lastName : String
+  +email : String
+  ==**Relations**==
+  +investments : Investment[]
+}
+
+together {
+  class Transaction {
+    +id : String
+    +previousTransactionId : String?
+    +externalReference : String?
+    +investmentId : String?
+    +investorId: String?
+    +otherInvestorId: String?
+    +tokenAmount : int
+    +nominalValue : double
+    +currency : String
+    +tokenQuotaAfterTransaction : int
+    +tokenQuotaPercentageAfterTransaction : double
+    +createdAt : Date
+    ==**Relations**==
+    +previousTransaction : Transaction?
+    +investor : Investor?
+    +otherInvestor : Investor?
+    +investment : Investment?
+    ==**Derived**==
+    +transactionType : TransactionType
+    +totalNominalValue : double
+  }
+
+  enum TransactionType {
+    BUY
+    SELL
+    BURN
+  }
+}
+
+note bottom of Transaction
+  Investor(otherInvestor)=null indicates that 
+  is the issuing company selling(buying) tokens.
+  The investor is null for the first issuance
+  transactions, when the company allocates tokens
+  to investors.
+  The otherInvestor is null if the company buys 
+  tokens back from the investors (only for 
+  AssetIssuances).
+  **Investor and otherInvestor __cannot be null__** 
+  **__at the same time__.**
+
+  Amount is positive when the investor is buying 
+  tokens from otherInvestor and negative when the 
+  investor is selling tokens to otherInvestor.
+end note
+
+together {
+  abstract Investment {
+    //The Investment of an Investor in an Issuance.//
+    //It contains all the transactions carried out by//
+    //the investor in this issuance.//
+    --
+    +issuanceId : String
+    +investorId : String
+    +initialTokenAmount : int
+    +currentTokenAmount : int
+    +custodialTokenAmount : int
+    +noncustodialTokenAmount : int
+    ==**Relations**==
+    +issuance : Issuance
+    +investor : Investor
+    +transactions : Transaction[]
+    ==**Derived**==
+    +currentTokenPercentage : double
+  }
+
+  class FinancialInstrumentInvestment {
+    ==**Relations**==
+    +payments : Payment[]
+    ==**Derived**==
+    +getCurrentQuotaValue() : double
+  }
+
+  class AssetInvestment {
+    //The Investment of an Investor//
+    //in an Asset Issuance.//
+    +burntTokenAmount : int
+  }
+}
+
+class Payment {
+  //The Payment of an Investment//
+  //in a Financial Instrument Issuance.//
+  --
+  +id : String
+  +investmentId : String
+  +paidNominalValue : double
+  +paidInterest : double
+  +currency : String
+  +dueAt : Date
+  +paidAt : Date?
+  ==**Derived**==
+  +totalPaidAmount : double
+}
+
+' Relationships
+
+AuthUser "1" -- "0..*" CompanyUser
+AuthUser "1" -- "0..1" Investor
+CompanyUser "1..*" --* "1" Company
+CompanyUser --> Role
+Company "1" *-- "1..*" Issuance
+Issuance <|-- FinancialInstrumentIssuance
+Issuance <|-- AssetIssuance
+FinancialInstrumentIssuance -> FinancialInstrumentType
+AssetIssuance -> AssetType
+Investor "1" o-- "0..*" Investment
+Investment "1" *-- "0..*" Transaction: investment
+Investor "0..1" <-- "0..*" Transaction: otherInvestor
+Investor "0..1" <-- "0..*" Transaction: investor
+Transaction -> TransactionType
+Transaction --> "0..1" Transaction: previousTransaction
+
+' The issuance is composed by one or more investments
+Issuance "1" o-- "1..*" Investment
+Investment <|-- FinancialInstrumentInvestment
+Investment <|-- AssetInvestment
+FinancialInstrumentInvestment "1" *-- "0..*" Payment
+
+
+@enduml

@@ -1,1 +1,1 @@
-# stellar-kickstarter
+# Morpheus APP Structure

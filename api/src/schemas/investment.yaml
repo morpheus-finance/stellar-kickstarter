@@ -1,0 +1,64 @@
+openapi: 3.1.0
+info:
+  title: Investment schema
+  version: 1.0.0
+
+components:
+  schemas:
+    Investment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the investment.
+          readOnly: true
+        issuance_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the issuance.
+        investor_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the investor.
+        initial_quota:
+          type: number
+          format: float
+          description: |-
+            The initial quota of the tokens owned by the investor the issuance
+            was created, that is, when the first issuance transactions were
+            made.
+          readOnly: true
+        current_quota:
+          type: number
+          format: float
+          description: |-
+            The current quota of the tokens owned by the investor.
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          description: When the investment was created.
+          readOnly: true
+        custodial_token_amount:
+          type: integer
+          format: int32
+          description: |-
+            The amount of tokens that are in the custody of the investor.
+          readOnly: true
+        noncustodial_token_amount:
+          type: integer
+          format: int32
+          description: |-
+            The amount of tokens that are legally owned by the investor but that
+            are not in the custody of the investor.
+          readOnly: true
+      required:
+        - id
+        - issuance_id
+        - investor_id
+        - initial_quota
+        - current_quota
+        - created_at
+        - custodial_token_amount
+        - noncustodial_token_amount

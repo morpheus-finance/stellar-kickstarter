@@ -1,0 +1,55 @@
+@startuml seq-financial-instrument-contract
+!theme sketchy-outline
+skinparam DefaultFontName monospaced
+autonumber 1 1 "<b>[00]"
+
+actor "Company/Investor" as client
+participant Morfeo as mph
+control "Morfeo Pass\nSmart Contract" as token
+control "Issuance\nSmart Contract" as sc
+' == Issuance ==
+' mph -> token: Issue(max_token_supply, ...params)
+
+
+== KYB/C ==
+
+note over sc: This is any issuance created\nwith the Morfeo platform
+client -> mph: Sign up
+mph -> mph: KYB/C
+alt #Pink KYB/C failed
+    mph --> client: <font color=red>rejected</font>
+else #LightGreen KYB/C okay
+    mph -> token: add trustline\n+ mint and transfer token
+    token --> client: Morfeo pass token
+end
+
+
+newpage
+' restart numbering
+autonumber 1 1 "<b>[00]"
+note over sc: This is any issuance created\nwith the Morfeo platform
+
+
+== Operations ==
+
+alt #Pink Account has not Morfeo pass token
+    client -> sc: any operation
+    sc --> client: <font color=red>rejected</font>
+else #LightGreen Account has Morfeo pass token
+    client -> sc: any operation
+    sc --> client: <font color=green>accepted</font>
+end
+
+newpage
+' restart numbering
+autonumber 1 1 "<b>[00]"
+note over sc: This is any issuance created\nwith the Morfeo platform
+== Revoke ==
+mph -> token: burn(client)
+token --> mph
+
+note across: The client's token is burned
+client -> sc: any operation
+sc --> client: <font color=red>rejected</font>
+
+@enduml

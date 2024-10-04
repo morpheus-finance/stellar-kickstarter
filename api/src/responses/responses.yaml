@@ -1,0 +1,50 @@
+openapi: 3.1.0
+info:
+  title: ''
+  version: 1.0.0
+
+components:
+  responses:
+    OK:
+      description: 200 OK
+
+    Created:
+      description: 201 Created
+
+    NoContent:
+      description: No Content
+
+    BadRequest:
+      description: >-
+        The format of the request is not valid.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/error.yaml#/components/schemas/Error
+
+    Unauthorized:
+      description: |
+        The client is not authenticated.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/error.yaml#/components/schemas/Error'
+
+    Forbidden:
+      description: |-
+        The client is properly authenticated (if needed) but it's not
+        authorized to access this resource. 
+
+        The client shall not retry the operation.
+
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/error.yaml#/components/schemas/Error'
+
+    NotFound:
+      description: 404 Not found.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/error.yaml#/components/schemas/Error'

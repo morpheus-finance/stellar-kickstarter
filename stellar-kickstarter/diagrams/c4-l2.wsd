@@ -1,0 +1,37 @@
+@startuml c4-l2-diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+
+!theme sketchy-outline
+skinparam DefaultFontName monospaced
+
+Person(Company, "Company", "Issues and manages digital assets (asset reference tokens and digital securities)")
+Person(Investor, "Investor", "Invests in digital assets (asset reference tokens and digital securities)")
+Person(Admin, "Admin", "Oversees platform operations and monitors transactions")
+
+System_Boundary(MorfeoSystem, "Morfeo App") {
+    Container(MorfeoUI, "Morfeo UI", "React + Typescript", "Displays digital securities, user portfolio, and investment returns")
+    Container(MorfeoApi, "Morfeo API", "Supabase", "Handles user accounts, transactions, and debt servicing")
+    Container(Auth, "Auth", "Supabase", "Manages user authentication and authorization")
+    Container(ScDeployer, "ScDeployer", "Rust + Soroban", "Smart contract deployer. Deploys custom smart contracts on Stellar")
+    Container(AdminPanel, "Admin Panel", "Supabase", "Allows to monitor and manage the platform")
+    ContainerDb(Database, "Database", "PostgreSQL", "Stores user, securities, and transaction data")
+}
+
+System_Ext(Extension, "Simple Signer", "Wallet Manager.\nConnects to digital wallets to sign transactions")
+System_Ext(Stellar, "Stellar", "Stellar Smart Contracts.\nProcesses on-chain transactions for digital securities")
+System_Ext(Anchor, "Anchor", "Anchor Service USDC/EURC to FIAT USD/EUR.\nFacilitates fiat on/off-ramps for stablecoins",)
+
+Rel(Company, MorfeoUI, "Interacts with")
+Rel(Investor, MorfeoUI, "Interacts with")
+Rel(Admin, AdminPanel, "Administers and monitors")
+Rel(AdminPanel, Database, "Updates and retrieves data from")
+Rel(MorfeoUI, Extension, "Uses for", "Signs transactions")
+Rel(MorfeoUI, Auth, "Uses for", "Authentication and authorization")
+Rel(MorfeoUI, MorfeoApi, "Communicates with")
+Rel(MorfeoApi, Stellar, "Performs transactions on")
+Rel(MorfeoApi, ScDeployer, "Uses")
+Rel(MorfeoApi, Database, "Reads from and writes to")
+Rel(MorfeoApi, Anchor, "Uses")
+
+@enduml

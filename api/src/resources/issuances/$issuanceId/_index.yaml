@@ -1,0 +1,23 @@
+parameters:
+  - $ref: ../../../parameters/issuance_id.yaml
+
+get:
+  operationId: getIssuance
+  summary: Get issuance
+  tags:
+    - Issuances
+  description: |-
+    Get an issuance by id.
+  security: []
+  responses:
+    200:
+      description: |-
+        The retrieved issuance.
+      content:
+        application/json:
+          schema:
+            $ref: ../../../responses/get_issuance_response.yaml#/components/schemas/GetIssuanceResponse
+    400:
+      $ref: '../../../responses/responses.yaml#/components/responses/BadRequest'
+    404:
+      $ref: '../../../responses/responses.yaml#/components/responses/NotFound'

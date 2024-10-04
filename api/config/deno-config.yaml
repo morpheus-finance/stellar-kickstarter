@@ -1,0 +1,4 @@
+enumPropertyNaming: UPPERCASE
+npmName: w-api-spec-v2
+supportsES6: true
+platform: deno

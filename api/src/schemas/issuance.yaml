@@ -1,0 +1,54 @@
+openapi: 3.1.0
+info:
+  title: Issuance API
+  version: 1.0.0
+
+components:
+  schemas:
+    Issuance:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the issuance.
+        issuance_type:
+          $ref: issuance_type.yaml#/components/schemas/IssuanceType
+        company_id:
+          type: string
+          description: The id of the company that issued the issuance.
+        token_amount:
+          type: integer
+          format: int32
+          description: The amount of token issued within the issuance.
+        created_at:
+          type: string
+          format: date-time
+          description: When the issuance has been created.
+        name:
+          type: string
+          description: The name shown of the issuance.
+        external_reference:
+          type: string
+          description: The external reference via which the issuance was created.
+        terms_of_contract_url:
+          type: string
+          format: uri
+          description: The URL where to find the terms of the contract.
+        frozen_token_amount:
+          type: integer
+          format: int32
+          description: |-
+            The amount of tokens that has been frozen. A token is frozen when it
+            is sold to an investor but the investor decides to let the company
+            have the custody of the token. The company cannot sell the token to
+            another investor.
+      required:
+        - id
+        - issuance_type
+        - company_id
+        - token_amount
+        - created_at
+        - name
+        - external_reference
+        - terms_of_contract_url
+        - frozen_token_amount
